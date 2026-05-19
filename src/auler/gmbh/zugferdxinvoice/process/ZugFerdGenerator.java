@@ -380,12 +380,15 @@ public class ZugFerdGenerator {
 	 */
 	private void embedFiles(Invoice zugFerdInvoice) {
 		
-		MAttachment atm = new MAttachment(Env.getCtx(), MDocType.Table_ID, invoice.getC_DocTypeTarget_ID(), invoice.getC_DocTypeTarget().getC_DocType_UU(),  null);
-		
-		for ( MAttachmentEntry entry : atm.getEntries()) {
-			if (entry.isPDF()) {
-				FileAttachment fa = new FileAttachment(entry.getName(), entry.getContentType(), "", entry.getData());
-				zugFerdInvoice.embedFileInXML(fa);
+		MDocType docType = MDocType.get(invoice.getC_DocTypeTarget_ID());
+		try (MAttachment atm = new MAttachment(Env.getCtx(), MDocType.Table_ID, 
+				docType.getC_DocType_ID(), 
+				docType.getC_DocType_UU(),  null)) {
+			for ( MAttachmentEntry entry : atm.getEntries()) {
+				if (entry.isPDF()) {
+					FileAttachment fa = new FileAttachment(entry.getName(), entry.getContentType(), "", entry.getData());
+					zugFerdInvoice.embedFileInXML(fa);
+				}
 			}
 		}
 
